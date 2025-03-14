@@ -3,6 +3,8 @@ local M = {}
 local neosvim_dir = "NeoSvim"
 M.switch_logs = {} -- Store logs in memory
 
+print(package.path)
+
 -- Function to restore to initial state
 function M:show_logs()
 	if #self.switch_logs == 0 then
