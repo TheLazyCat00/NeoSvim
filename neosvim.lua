@@ -1,9 +1,32 @@
 local M = {}
 
-local neosvim_dir = "NeoSvim"
-M.switch_logs = {} -- Store logs in memory
+local function add_to_path(path)
+	if not package.path:find(path, 1, true) then
+		package.path = path .. "/?.lua;" .. package.path
+	end
+end
 
-print(package.path)
+local function set_config_path(path)
+	-- Store original if not already stored
+	vim._original_stdpath = vim._original_stdpath or vim.fn.stdpath
+	
+	-- Override stdpath
+	vim.fn.stdpath = function(what)
+	if what == "config" then
+		return path
+	end
+		return vim._original_stdpath(what)
+	end
+end
+
+local config_path = vim.fn.stdpath("config")
+local neosvim_path = config_path .. "/NeoSvim"
+local lua_path = neosvim_path .. "/lua"
+
+set_config_path(neosvim_path)
+add_to_path(lua_path)
+
+M.switch_logs = {} -- Store logs in memory
 
 -- Function to restore to initial state
 function M:show_logs()
@@ -171,16 +194,12 @@ function M:delete_dir(dir_path)
 	os.execute(command)
 end
 
-function M:run_init(dir)
+function M:run_init()
 	self:setup_commands()
-	dir = dir or ("/" .. neosvim_dir)
-
-	-- Get the full path to the NeoSvim directory
-	local whole_dir = vim.fn.getcwd() .. dir
 
 	-- Try to source the init files with full paths
-	local init_lua = whole_dir .. "/init.lua"
-	local init_vim = whole_dir .. "/init.vim"
+	local init_lua = neosvim_path .. "/init.lua"
+	local init_vim = neosvim_path .. "/init.vim"
 
 	local sourced = false
 
@@ -223,11 +242,11 @@ end
 
 function M:git_clone(url, callback)
 	-- Clear previous logs
-	self.switch_logs = {"=== NeoSvim Switch Logs ===", "Cloning " .. url .. " to " .. neosvim_dir .. "...", ""}
+	self.switch_logs = {"=== NeoSvim Switch Logs ===", "Cloning " .. url .. " to " .. neosvim_path .. "...", ""}
 
 	-- Create a buffer for showing progress
 	local buf = vim.api.nvim_create_buf(false, true)
-	vim.api.nvim_buf_set_lines(buf, 0, -1, false, {"Cloning " .. url .. " to " .. neosvim_dir .. "...", ""})
+	vim.api.nvim_buf_set_lines(buf, 0, -1, false, {"Cloning " .. url .. " to " .. neosvim_path .. "...", ""})
 
 	-- Create a floating window for progress
 	local width = math.min(120, math.floor(vim.o.columns * 0.8))
@@ -255,7 +274,7 @@ function M:git_clone(url, callback)
 	local exit_code
 
 	-- Determine the shell command based on OS
-	local cmd = {"git", "clone", "--progress", url, neosvim_dir}
+	local cmd = {"git", "clone", "--progress", url, neosvim_path}
 
 	-- Function to append output to the buffer
 	local function append_to_buffer(data, is_stderr)
@@ -293,7 +312,7 @@ function M:git_clone(url, callback)
 		end
 
 		-- Update buffer with all collected data
-		local display_lines = {"Cloning " .. url .. " to " .. neosvim_dir .. "..."}
+		local display_lines = {"Cloning " .. url .. " to " .. neosvim_path .. "..."}
 		for _, line in ipairs(stdout_data) do
 			table.insert(display_lines, line)
 		end
@@ -351,7 +370,7 @@ function M:git_clone(url, callback)
 end
 
 function M:try_clone(url, force)
-	if self:directory_exists(neosvim_dir) and not force then
+	if self:directory_exists(neosvim_path) and not force then
 		-- Directory exists, ask for confirmation
 		self:popup_input(
 			"Configuration already exists. Type 'switch' to replace it: ",
@@ -360,7 +379,7 @@ function M:try_clone(url, force)
 					vim.notify("Operation cancelled", vim.log.levels.INFO)
 					return
 				else
-					self:delete_dir(neosvim_dir)
+					self:delete_dir(neosvim_path)
 					self:git_clone(url, function(success)
 						if success then
 							vim.notify("Clone completed successfully", vim.log.levels.INFO)
