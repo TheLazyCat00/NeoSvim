@@ -169,11 +169,12 @@ function M:delete_dir(dir_path)
 	os.execute(command)
 end
 
-function M:run_init()
+function M:run_init(dir)
 	self:setup_commands()
+	dir = dir or ("/" .. neosvim_dir)
 
 	-- Get the full path to the NeoSvim directory
-	local whole_dir = vim.fn.getcwd() .. "/" .. neosvim_dir
+	local whole_dir = vim.fn.getcwd() .. dir
 
 	-- Try to source the init files with full paths
 	local init_lua = whole_dir .. "/init.lua"
@@ -203,6 +204,8 @@ function M:run_init()
 		vim.notify("Something went wrong", vim.log.levels.ERROR)
 		return false
 	end
+
+	return true
 end
 
 function M:ask_repo()
@@ -404,7 +407,5 @@ end
 function M:switch(url)
 	self:try_clone(url)
 end
-
-M:run_init()
 
 return M

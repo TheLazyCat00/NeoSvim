@@ -1,1 +1,1 @@
-require("neosvim")
+require("neosvim"):run_init()
