@@ -9,3 +9,4 @@ local config_path = vim.fn.stdpath("config")
 add_to_path(config_path)
 
 require("neosvim"):run_init()
+require("globals")
