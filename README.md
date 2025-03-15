@@ -23,9 +23,9 @@ To install NeoSvim:
 
 2. Clone the NeoSvim repository:
    ```bash
-   git clone https://github.com/yourusername/neosvim.git ~/.config/nvim   # Linux/macOS
+   git clone https://github.com/TheLazyCat00/NeoSvim.git ~/.config/nvim   # Linux/macOS
    # or
-   git clone https://github.com/yourusername/neosvim.git %LOCALAPPDATA%\nvim   # Windows
+   git clone https://github.com/TheLazyCat00/NeoSvim.git %LOCALAPPDATA%\nvim   # Windows
    ```
 
 3. Launch Neovim and NeoSvim will initialize automatically.
