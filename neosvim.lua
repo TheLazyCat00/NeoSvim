@@ -207,7 +207,6 @@ function M:run_init()
 		local success, err = pcall(vim.cmd, "source " .. init_lua)
 		if success then
 			sourced = true
-			vim.notify("Sourced " .. init_lua)
 		else
 			vim.notify("Error sourcing " .. init_lua .. ": " .. tostring(err), vim.log.levels.ERROR)
 		end
@@ -215,7 +214,6 @@ function M:run_init()
 		local success, err = pcall(vim.cmd, "source " .. init_vim)
 		if success then
 			sourced = true
-			vim.notify("Sourced " .. init_vim, vim.log.levels.INFO)
 		else
 			vim.notify("Error sourcing " .. init_vim .. ": " .. tostring(err), vim.log.levels.ERROR)
 		end
